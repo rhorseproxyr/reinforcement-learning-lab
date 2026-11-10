@@ -10,7 +10,7 @@ class QLearningAgent():
     self.eps_min = eps_min
     self.eps_max = 1
     self.epsilon = 1
-    
+    self.best_mean_rewards = float(-inf)
   def update_q_table(self, reward, state, new_state, action, terminated):
     max_next_q_value = 0 if terminated else np.max(self.qtable[new_state])
     target = reward + self.gamma * max_next_q_value
@@ -25,7 +25,23 @@ class QLearningAgent():
       return self.env.action_space.sample()
     else:
       return np.argmax(self.qtable[state])
-
+      
+  def evaluate_agent(self, max_evaluation_episode):
+    total_rewards = 0
+    for episode in range(max_evaluation_episode):
+      state, _ = self.env.reset()
+      for step in range(max_evaluation_step):
+        action = self.choose_action(state, exploration=False)
+        new_state, reward, terminated, truncated, _ = self.env.step(action)
+        total_rewards += reward
+        state = new_state
+        if terminated or truncated:
+          break
+    mean_rewards = total_rewards / max_evaluation_episode
+    if mean_rewards > self.best_mean_rewards:
+      self.best_mean_rewards = mean_rewards
+      print(f"👑 New best agent detected with {mean_rewards:.2f} mean reward")
+        
   def training(self, max_step, max_episode,):
     for episode in range(max_episode):
       state, _ = self.env.reset()
