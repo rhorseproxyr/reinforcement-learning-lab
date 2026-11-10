@@ -16,7 +16,10 @@ class QLearningAgent():
     target = reward + self.gamma * max_next_q_value
     error = target - self.qtable[state, action]
     self.qtable[state, action] += self.lr * error
-    
+
+  def calculate_epsilon(self, current_episode, max_episode):
+    self.epsilon = self.epsilon_max - ((self.epsilon_max - self.epsilon_min) * current_episode / max_episode)
+                                       
   def choose_action(self, state, exploration=True):
     if exploration == True and np.random.random() < self.epsilon:
       return self.env.action_space.sample()
@@ -26,6 +29,7 @@ class QLearningAgent():
   def training(self, max_step, max_episode,):
     for episode in range(max_episode):
       state, _ = self.env.reset()
+      self.calculate_epsilon(episode, max_episode)
       for step in range(max_step):
         action = self.choose_action(state)
         new_state, reward, terminated, truncated, _ = self.env.step(action)
