@@ -1,6 +1,8 @@
 import gymnasium as gym
 import numpy as np
 
+
+
 class QLearningAgent():
   def __init__(self, qtable, gamma, lr, env, eps_min):
     self.qtable = qtable
@@ -38,6 +40,7 @@ class QLearningAgent():
         if terminated or truncated:
           break
     mean_rewards = total_rewards / max_evaluation_episode
+    print(f"Mean reward: {mean_rewards:.4f}")
     if mean_rewards > self.best_mean_rewards:
       self.best_mean_rewards = mean_rewards
       print(f"👑 New best agent detected with {mean_rewards:.2f} mean reward")
@@ -59,7 +62,7 @@ class QLearningAgent():
 
       if (episode + 1) % (max_episode // 50) == 0:
         print(f"Episode {episode+1}/{max_episode}\nEpsilon:{self.epsilon}")
-        self.evaluate_agent(max_evaluation_episode=10000, max_evaluation_step=500)
+        self.evaluate_agent(max_evaluation_episode=1000, max_evaluation_step=500)
 
 env = gym.make("Blackjack-v1")
 
@@ -68,6 +71,7 @@ action_space = env.action_space.n
 
 q_table = np.zeros((*state_space, action_space))
 
-agent = QLearningAgent(qtable=q_table,gamma=0.95,lr=0.1,env=env,eps_min=0.05)
+agent = QLearningAgent(qtable=q_table,gamma=0.4,lr=0.1,env=env,eps_min=0.05)
 
 agent.training(max_step=500,max_episode=150000)
+
